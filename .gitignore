@@ -8,3 +8,6 @@ public/
 
 *.DS_Store*
 update-website.sh
+
+# Python
+__pycache__/

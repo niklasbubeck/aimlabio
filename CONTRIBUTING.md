@@ -8,16 +8,21 @@ routes, easiest first.
 - [**Add a new team member**](../../issues/new?template=new-member.yml)
 - [**Update an existing profile**](../../issues/new?template=update-profile.yml)
 
-Fill the form in and submit it. A maintainer reviews it, applies the `approved` label, and a
-pull request with your profile is opened automatically — including your photo. You get a
-comment with the link. Once it is merged the site rebuilds and is live in about a minute.
+Only **two** things need typing: your name and a photo. Your profile URL, last name,
+affiliation and social icons are all worked out for you, and role and group are dropdowns
+with sensible defaults.
 
-On the update form, fill in **only what should change**. Everything you leave blank stays as
-it is. Moving someone to Alumni is just the Group field.
+A maintainer reviews the issue and applies the `approved` label; a pull request with your
+profile then opens automatically, including your photo, and you get a comment with the link.
+Once it is merged the site rebuilds and is live in about a minute.
 
-If something in your submission is wrong — a group that doesn't exist, a folder name with
-spaces, a photo that isn't an image — the bot comments on your issue saying exactly what to
-fix, and removes the `approved` label. Edit the issue and ask for it to be re-approved.
+On the update form, fill in **only what should change** — everything left blank stays as it
+is. Moving someone to Alumni is just the Group field, and you are found by name, so you do
+not need to know where any file lives.
+
+If something is wrong — a photo that isn't an image, an education line that can't be read —
+the bot comments on your issue with the exact reason and removes the `approved` label. Edit
+the issue and ask for it to be re-approved.
 
 ## 2. Anything else — edit the file and open a pull request
 
@@ -41,7 +46,8 @@ Where things live:
 | Homepage sections | `content/home/*.md` |
 | Navigation, site title, theme options | `config/_default/` |
 
-Two things that fail *silently*, so double-check them:
+Two things that fail *silently* if you edit a profile by hand, so double-check them (the
+forms above handle both for you):
 
 - **`authors:` in a profile must equal the folder name.** It is the key that links publications
   to people.
@@ -64,4 +70,7 @@ Open a [blank issue](../../issues/new) and describe what should change. Someone 
   GitHub account and the workflow holds a write token.
 - The generated pull request has already been built successfully by CI. Review it for content,
   not correctness of the YAML.
+- `python3 .github/scripts/test_issue_to_author.py` runs the automation's test suite locally;
+  CI runs it on any change under `.github/scripts/`.
+- [`docs/WORKFLOW.md`](docs/WORKFLOW.md) has diagrams of both pipelines.
 - Never run the site build by hand and never commit generated HTML. See `README.md`.

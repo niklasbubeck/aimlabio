@@ -1,53 +1,62 @@
 name: Update an existing profile
-description: Change your role, group, photo, interests or biography.
+description: Change a role, group, photo, interests, links or biography.
 title: "Update profile: "
 labels: ["update-profile"]
 body:
   - type: markdown
     attributes:
       value: |
-        Fill in **only the fields you want to change** — everything you leave blank
-        stays exactly as it is. Moving someone to Alumni is just the Group field.
+        Fill in **only what should change**. Everything left blank stays exactly as
+        it is today.
+
+        Moving someone to Alumni is just the Group field. Finding the profile is by
+        name — you do not need to know where the file lives.
   - type: input
-    id: folder-name
+    id: your-name
     attributes:
-      label: Folder name
-      description: >-
-        The folder under content/authors/ — the last part of your profile URL,
-        e.g. /author/jane-doe/ is usually the folder JaneDoe.
-      placeholder: JaneDoe
+      label: Your name
+      description: The name as it currently appears on the website.
+      placeholder: Jane Doe
     validations: {required: true}
-  - type: input
-    id: role
-    attributes:
-      label: Role
-      placeholder: Postdoctoral researcher
-    validations: {required: false}
   - type: dropdown
     id: group
     attributes:
       label: Group
       options:
         - No change
-        - Chair
-        - Management
-        - Senior Researchers
         - Researchers
+        - Senior Researchers
+        - Management
         - Collaborators
         - Visitors
+        - Chair
         - Alumni
       default: 0
     validations: {required: false}
-  - type: input
-    id: short-bio
+  - type: dropdown
+    id: role
     attributes:
-      label: Short bio
+      label: Role
+      options:
+        - No change
+        - Doctoral researcher
+        - Research Scientist
+        - Affiliated Researcher
+        - Science Manager
+        - Executive Assistant
+        - Other (write it in the box below)
+      default: 0
+    validations: {required: false}
+  - type: input
+    id: role-other
+    attributes:
+      label: Role (if you picked Other)
     validations: {required: false}
   - type: textarea
-    id: interests
+    id: photo
     attributes:
-      label: Interests
-      description: One per line. This replaces your existing list.
+      label: Photo
+      description: Drag a new square image here to replace the current one.
     validations: {required: false}
   - type: input
     id: email
@@ -55,14 +64,25 @@ body:
       label: Email
     validations: {required: false}
   - type: textarea
-    id: photo
+    id: interests
     attributes:
-      label: Photo
-      description: Drag a new square image here to replace your current one.
+      label: Interests
+      description: One per line. Replaces the existing list.
+    validations: {required: false}
+  - type: textarea
+    id: links
+    attributes:
+      label: Links
+      description: One URL per line. Replaces the existing links.
+    validations: {required: false}
+  - type: input
+    id: short-bio
+    attributes:
+      label: Short bio
     validations: {required: false}
   - type: textarea
     id: biography
     attributes:
       label: Biography
-      description: Replaces the full text on your profile page. Markdown is supported.
+      description: Replaces the longer text on the profile page. Markdown works.
     validations: {required: false}

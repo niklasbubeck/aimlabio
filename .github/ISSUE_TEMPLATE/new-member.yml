@@ -6,68 +6,65 @@ body:
   - type: markdown
     attributes:
       value: |
-        Fill this in and submit. A maintainer reviews it and, once approved, a pull
-        request with your profile is opened automatically — you do not need write
-        access to this repository.
+        Only **two** things are required: your name and a photo. Everything else is
+        optional or already filled in — change what applies to you and leave the rest.
+
+        Your profile URL, last name and affiliation are worked out automatically.
+        A maintainer reviews this and a pull request is opened for you; you do not
+        need write access to the repository.
   - type: input
-    id: display-name
+    id: full-name
     attributes:
-      label: Display name
-      description: Shown on the site. Umlauts and accents are fine.
+      label: Full name
+      description: Exactly as it should appear on the site. Umlauts and accents are fine.
       placeholder: Jane Doe
     validations: {required: true}
-  - type: input
-    id: folder-name
+  - type: textarea
+    id: photo
     attributes:
-      label: Folder name
+      label: Photo
       description: >-
-        Identifier used in the URL and to link your publications to you.
-        Letters, digits, '-' and '_' only, no spaces. Convention here is FirstnameLastname.
-      placeholder: JaneDoe
+        Drag a square image into this box (JPEG, PNG, WebP or GIF; 500x500 is plenty,
+        max 8 MB). Do not paste a link to a photo hosted somewhere else.
     validations: {required: true}
-  - type: input
-    id: last-name
-    attributes:
-      label: Last name
-      placeholder: Doe
-    validations: {required: false}
-  - type: input
+  - type: dropdown
     id: role
     attributes:
       label: Role
-      placeholder: Doctoral researcher
+      options:
+        - Doctoral researcher
+        - Research Scientist
+        - Affiliated Researcher
+        - Science Manager
+        - Executive Assistant
+        - Other (write it in the box below)
+      default: 0
     validations: {required: true}
+  - type: input
+    id: role-other
+    attributes:
+      label: Role (if you picked Other)
+    validations: {required: false}
   - type: dropdown
     id: group
     attributes:
       label: Group
       description: Which heading you appear under on the People section.
       options:
-        - Chair
-        - Management
-        - Senior Researchers
         - Researchers
+        - Senior Researchers
+        - Management
         - Collaborators
         - Visitors
+        - Chair
         - Alumni
+      default: 0
     validations: {required: true}
   - type: input
-    id: organization
+    id: email
     attributes:
-      label: Organization
-      value: Technical University of Munich
-    validations: {required: false}
-  - type: input
-    id: organization-url
-    attributes:
-      label: Organization URL
-      value: https://www.translatum.tum.de/en/translatum/research-groups/daniel-rueckert-ai-in-healthcare-and-medicine/
-    validations: {required: false}
-  - type: input
-    id: short-bio
-    attributes:
-      label: Short bio
-      description: One line, shown under posts you author.
+      label: Email
+      placeholder: jane.doe@tum.de
     validations: {required: false}
   - type: textarea
     id: interests
@@ -82,54 +79,40 @@ body:
     id: education
     attributes:
       label: Education
-      description: "One per line, as: Course | Institution | Year"
+      description: "One per line: Course | Institution | Year"
       placeholder: |
         MSc Computer Science | TUM | 2024
         BSc Informatik | LMU Munich | 2021
     validations: {required: false}
-  - type: input
-    id: email
-    attributes:
-      label: Email
-      placeholder: jane.doe@tum.de
-    validations: {required: false}
-  - type: input
-    id: github
-    attributes:
-      label: GitHub
-      placeholder: https://github.com/janedoe
-    validations: {required: false}
-  - type: input
-    id: linkedin
-    attributes:
-      label: LinkedIn
-      placeholder: https://linkedin.com/in/janedoe
-    validations: {required: false}
-  - type: input
-    id: google-scholar
-    attributes:
-      label: Google Scholar
-      placeholder: https://scholar.google.com/citations?user=...
-    validations: {required: false}
-  - type: input
-    id: website
-    attributes:
-      label: Website
-      placeholder: https://janedoe.example
-    validations: {required: false}
   - type: textarea
-    id: photo
+    id: links
     attributes:
-      label: Photo
+      label: Links
       description: >-
-        Drag a square JPEG, PNG, WebP or GIF into this box (500x500 is plenty, max 8 MB).
-        Do not paste a link to a photo hosted elsewhere.
-    validations: {required: true}
+        One URL per line — GitHub, Google Scholar, LinkedIn, ORCID, a personal site.
+        The right icon is picked automatically, you do not need to say which is which.
+      placeholder: |
+        https://github.com/janedoe
+        https://scholar.google.com/citations?user=abc123
+    validations: {required: false}
+  - type: input
+    id: short-bio
+    attributes:
+      label: Short bio
+      description: One line, shown under posts you author.
+    validations: {required: false}
   - type: textarea
     id: biography
     attributes:
       label: Biography
       description: >-
-        The full text shown on your profile page. Markdown is supported
+        The longer text on your profile page. Markdown works
         (**bold**, [links](https://example.com)).
+    validations: {required: false}
+  - type: input
+    id: additional-affiliation
+    attributes:
+      label: Additional affiliation
+      description: Only if you belong somewhere beyond TUM, e.g. a graduate school.
+      placeholder: Konrad Zuse School of Excellence in Reliable AI
     validations: {required: false}
