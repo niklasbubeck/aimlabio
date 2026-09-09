@@ -1,0 +1,68 @@
+name: Update an existing profile
+description: Change your role, group, photo, interests or biography.
+title: "Update profile: "
+labels: ["update-profile"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Fill in **only the fields you want to change** — everything you leave blank
+        stays exactly as it is. Moving someone to Alumni is just the Group field.
+  - type: input
+    id: folder-name
+    attributes:
+      label: Folder name
+      description: >-
+        The folder under content/authors/ — the last part of your profile URL,
+        e.g. /author/jane-doe/ is usually the folder JaneDoe.
+      placeholder: JaneDoe
+    validations: {required: true}
+  - type: input
+    id: role
+    attributes:
+      label: Role
+      placeholder: Postdoctoral researcher
+    validations: {required: false}
+  - type: dropdown
+    id: group
+    attributes:
+      label: Group
+      options:
+        - No change
+        - Chair
+        - Management
+        - Senior Researchers
+        - Researchers
+        - Collaborators
+        - Visitors
+        - Alumni
+      default: 0
+    validations: {required: false}
+  - type: input
+    id: short-bio
+    attributes:
+      label: Short bio
+    validations: {required: false}
+  - type: textarea
+    id: interests
+    attributes:
+      label: Interests
+      description: One per line. This replaces your existing list.
+    validations: {required: false}
+  - type: input
+    id: email
+    attributes:
+      label: Email
+    validations: {required: false}
+  - type: textarea
+    id: photo
+    attributes:
+      label: Photo
+      description: Drag a new square image here to replace your current one.
+    validations: {required: false}
+  - type: textarea
+    id: biography
+    attributes:
+      label: Biography
+      description: Replaces the full text on your profile page. Markdown is supported.
+    validations: {required: false}

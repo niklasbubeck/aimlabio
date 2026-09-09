@@ -1,0 +1,118 @@
+# Turns an approved "Add a new team member" / "Update an existing profile" issue
+# into a pull request, so lab members can contribute without write access.
+#
+# The gate is the `approved` label: a maintainer applies it after eyeballing the
+# issue. Until then nothing runs. This matters because this workflow has a write
+# token and the issue body is written by anyone with a GitHub account.
+#
+# Issue text is passed to steps through `env:` and never interpolated into a
+# `run:` block, so nothing in an issue can be executed as shell.
+name: Member request
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: member-request-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  open-pr:
+    # Only fires when a maintainer adds `approved` to an issue filed through one
+    # of the two forms.
+    if: >-
+      github.event.label.name == 'approved' &&
+      (contains(github.event.issue.labels.*.name, 'new-member') ||
+       contains(github.event.issue.labels.*.name, 'update-profile'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Determine request kind
+        id: kind
+        run: |
+          if [ "${{ contains(github.event.issue.labels.*.name, 'new-member') }}" = "true" ]; then
+            echo "kind=new-member" >> "$GITHUB_OUTPUT"
+          else
+            echo "kind=update-profile" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Apply the request to content/authors/
+        id: gen
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_KIND: ${{ steps.kind.outputs.kind }}
+        run: python3 .github/scripts/issue_to_author.py
+
+      # PRs opened with GITHUB_TOKEN do not trigger other workflows, so the usual
+      # Build check will not run on this PR. Build here instead, so a submission
+      # that breaks the site is caught before a reviewer ever sees it.
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.19'
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            resources/_gen
+          key: hugo-${{ runner.os }}-${{ hashFiles('go.sum') }}
+          restore-keys: hugo-${{ runner.os }}-
+      - uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: '0.74.3'
+          extended: true
+      - name: Verify the site still builds
+        run: hugo --gc --minify -b "http://localhost:1313/"
+
+      - name: Open the pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE: ${{ github.event.issue.number }}
+          AUTHOR: ${{ github.event.issue.user.login }}
+          SUMMARY: ${{ steps.gen.outputs.summary }}
+          FOLDER: ${{ steps.gen.outputs.folder }}
+        run: |
+          set -euo pipefail
+          BRANCH="member-request/${ISSUE}"
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add "content/authors/${FOLDER}"
+          git commit -m "$SUMMARY" -m "Requested by @${AUTHOR} in #${ISSUE}."
+          git push --force-with-lease -u origin "$BRANCH"
+          URL=$(gh pr create \
+            --base main --head "$BRANCH" \
+            --title "$SUMMARY" \
+            --body "Generated from #${ISSUE}, requested by @${AUTHOR}.
+
+          The site was built successfully with this change before this PR was opened.
+          Review the profile below, then merge to publish. Closes #${ISSUE}." 2>/dev/null \
+            || gh pr view "$BRANCH" --json url --jq .url)
+          gh issue comment "$ISSUE" --body "Thanks! This is now open as ${URL} and will go live once a maintainer merges it."
+
+      - name: Report failure back on the issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE: ${{ github.event.issue.number }}
+          ERROR: ${{ steps.gen.outputs.error }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          if [ -n "${ERROR:-}" ]; then
+            BODY="This request could not be applied:
+
+          > ${ERROR}
+
+          Edit the issue above to fix it, then a maintainer can re-apply the \`approved\` label."
+          else
+            BODY="This request could not be applied. See the [workflow run](${RUN_URL}) for details."
+          fi
+          gh issue comment "$ISSUE" --body "$BODY"
+          gh issue edit "$ISSUE" --remove-label approved

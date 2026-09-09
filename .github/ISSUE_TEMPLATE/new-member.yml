@@ -1,0 +1,135 @@
+name: Add a new team member
+description: Request a profile on the People section of the website.
+title: "Add team member: "
+labels: ["new-member"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Fill this in and submit. A maintainer reviews it and, once approved, a pull
+        request with your profile is opened automatically — you do not need write
+        access to this repository.
+  - type: input
+    id: display-name
+    attributes:
+      label: Display name
+      description: Shown on the site. Umlauts and accents are fine.
+      placeholder: Jane Doe
+    validations: {required: true}
+  - type: input
+    id: folder-name
+    attributes:
+      label: Folder name
+      description: >-
+        Identifier used in the URL and to link your publications to you.
+        Letters, digits, '-' and '_' only, no spaces. Convention here is FirstnameLastname.
+      placeholder: JaneDoe
+    validations: {required: true}
+  - type: input
+    id: last-name
+    attributes:
+      label: Last name
+      placeholder: Doe
+    validations: {required: false}
+  - type: input
+    id: role
+    attributes:
+      label: Role
+      placeholder: Doctoral researcher
+    validations: {required: true}
+  - type: dropdown
+    id: group
+    attributes:
+      label: Group
+      description: Which heading you appear under on the People section.
+      options:
+        - Chair
+        - Management
+        - Senior Researchers
+        - Researchers
+        - Collaborators
+        - Visitors
+        - Alumni
+    validations: {required: true}
+  - type: input
+    id: organization
+    attributes:
+      label: Organization
+      value: Technical University of Munich
+    validations: {required: false}
+  - type: input
+    id: organization-url
+    attributes:
+      label: Organization URL
+      value: https://www.translatum.tum.de/en/translatum/research-groups/daniel-rueckert-ai-in-healthcare-and-medicine/
+    validations: {required: false}
+  - type: input
+    id: short-bio
+    attributes:
+      label: Short bio
+      description: One line, shown under posts you author.
+    validations: {required: false}
+  - type: textarea
+    id: interests
+    attributes:
+      label: Interests
+      description: One per line.
+      placeholder: |
+        Medical Image Registration
+        Foundation Models
+    validations: {required: false}
+  - type: textarea
+    id: education
+    attributes:
+      label: Education
+      description: "One per line, as: Course | Institution | Year"
+      placeholder: |
+        MSc Computer Science | TUM | 2024
+        BSc Informatik | LMU Munich | 2021
+    validations: {required: false}
+  - type: input
+    id: email
+    attributes:
+      label: Email
+      placeholder: jane.doe@tum.de
+    validations: {required: false}
+  - type: input
+    id: github
+    attributes:
+      label: GitHub
+      placeholder: https://github.com/janedoe
+    validations: {required: false}
+  - type: input
+    id: linkedin
+    attributes:
+      label: LinkedIn
+      placeholder: https://linkedin.com/in/janedoe
+    validations: {required: false}
+  - type: input
+    id: google-scholar
+    attributes:
+      label: Google Scholar
+      placeholder: https://scholar.google.com/citations?user=...
+    validations: {required: false}
+  - type: input
+    id: website
+    attributes:
+      label: Website
+      placeholder: https://janedoe.example
+    validations: {required: false}
+  - type: textarea
+    id: photo
+    attributes:
+      label: Photo
+      description: >-
+        Drag a square JPEG, PNG or WebP into this box (500x500 is plenty, max 8 MB).
+        Do not paste a link to a photo hosted elsewhere.
+    validations: {required: true}
+  - type: textarea
+    id: biography
+    attributes:
+      label: Biography
+      description: >-
+        The full text shown on your profile page. Markdown is supported
+        (**bold**, [links](https://example.com)).
+    validations: {required: false}

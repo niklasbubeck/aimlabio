@@ -7,6 +7,13 @@ Hugo Academic).
 **You never build this site by hand.** Push a change and GitHub Actions builds and deploys it.
 No generated HTML lives in this repo.
 
+## Contributing without write access
+
+Lab members do not need to be repository collaborators. They can file a
+[form](.github/ISSUE_TEMPLATE/new-member.yml) to add or update a profile, which a maintainer
+turns into a pull request with one label, or edit any file through GitHub's web editor, which
+forks and opens a pull request for them automatically. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Publishing a change
 
 1. Edit a Markdown file under `content/` — on a branch, or directly in the GitHub web editor.
