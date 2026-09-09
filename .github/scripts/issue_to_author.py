@@ -26,6 +26,7 @@ IMAGE_EXT = {
     "image/jpg": ".jpg",
     "image/png": ".png",
     "image/webp": ".webp",
+    "image/gif": ".gif",
 }
 MAX_AVATAR_BYTES = 8 * 1024 * 1024
 
@@ -86,20 +87,31 @@ def download_avatar(section, folder):
     """Pull the image the submitter dragged into the issue into the profile."""
     if not section:
         return None
-    m = re.search(r"!\[[^\]]*\]\((https://[^\s)]+)\)", section) or re.search(
-        r"(https://\S+)", section
-    )
-    if not m:
+    # GitHub's image upload inserts an <img> tag; older clients and pasted
+    # markdown produce ![...](url). Accept both, plus a bare URL.
+    url = None
+    for pattern in (
+        r'<img[^>]*\ssrc=["\']([^"\']+)["\']',
+        r"!\[[^\]]*\]\((https?://[^\s)]+)\)",
+        r'(https?://[^\s"\'<>)]+)',
+    ):
+        m = re.search(pattern, section)
+        if m:
+            url = m.group(1).strip()
+            break
+    if not url:
         return None
-    url = m.group(1)
     if not url.startswith("https://"):
-        fail("The avatar must be an image uploaded to the issue.")
+        fail(f"The avatar must be an image uploaded to the issue (got '{url}').")
     req = urllib.request.Request(url, headers={"User-Agent": "aimlabio-bot"})
     with urllib.request.urlopen(req, timeout=60) as resp:
         ctype = (resp.headers.get("Content-Type") or "").split(";")[0].strip().lower()
         data = resp.read(MAX_AVATAR_BYTES + 1)
     if ctype not in IMAGE_EXT:
-        fail(f"The avatar must be a JPEG, PNG or WebP image (got '{ctype or 'unknown'}').")
+        fail(
+            f"The avatar must be a JPEG, PNG, WebP or GIF image "
+            f"(got '{ctype or 'unknown'}' from {url})."
+        )
     if len(data) > MAX_AVATAR_BYTES:
         fail("The avatar is larger than 8 MB. Please resize it (500x500 is plenty).")
     target = AUTHORS / folder

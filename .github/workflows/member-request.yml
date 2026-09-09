@@ -24,26 +24,39 @@ concurrency:
 
 jobs:
   open-pr:
-    # Only fires when a maintainer adds `approved` to an issue filed through one
-    # of the two forms.
-    if: >-
-      github.event.label.name == 'approved' &&
-      (contains(github.event.issue.labels.*.name, 'new-member') ||
-       contains(github.event.issue.labels.*.name, 'update-profile'))
+    # Only fires when a maintainer adds `approved` to an issue.
+    if: github.event.label.name == 'approved'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
+      # Prefer the form's label, but fall back to the shape of the body: GitHub
+      # silently drops template labels that do not exist in the repository, so
+      # the label alone is not a reliable signal. An `approved` label on any
+      # other issue leaves kind empty and the job simply does nothing.
       - name: Determine request kind
         id: kind
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          HAS_NEW: ${{ contains(github.event.issue.labels.*.name, 'new-member') }}
+          HAS_UPDATE: ${{ contains(github.event.issue.labels.*.name, 'update-profile') }}
         run: |
-          if [ "${{ contains(github.event.issue.labels.*.name, 'new-member') }}" = "true" ]; then
-            echo "kind=new-member" >> "$GITHUB_OUTPUT"
+          if [ "$HAS_NEW" = "true" ]; then
+            kind=new-member
+          elif [ "$HAS_UPDATE" = "true" ]; then
+            kind=update-profile
+          elif grep -q '^### Display name' <<< "$ISSUE_BODY"; then
+            kind=new-member
+          elif grep -q '^### Folder name' <<< "$ISSUE_BODY"; then
+            kind=update-profile
           else
-            echo "kind=update-profile" >> "$GITHUB_OUTPUT"
+            kind=""
+            echo "::notice::Issue is not a member request; nothing to do."
           fi
+          echo "kind=$kind" >> "$GITHUB_OUTPUT"
 
       - name: Apply the request to content/authors/
+        if: steps.kind.outputs.kind != ''
         id: gen
         env:
           ISSUE_BODY: ${{ github.event.issue.body }}
@@ -54,9 +67,11 @@ jobs:
       # Build check will not run on this PR. Build here instead, so a submission
       # that breaks the site is caught before a reviewer ever sees it.
       - uses: actions/setup-go@v5
+        if: steps.kind.outputs.kind != ''
         with:
           go-version: '1.19'
       - uses: actions/cache@v4
+        if: steps.kind.outputs.kind != ''
         with:
           path: |
             ~/go/pkg/mod
@@ -64,13 +79,16 @@ jobs:
           key: hugo-${{ runner.os }}-${{ hashFiles('go.sum') }}
           restore-keys: hugo-${{ runner.os }}-
       - uses: peaceiris/actions-hugo@v3
+        if: steps.kind.outputs.kind != ''
         with:
           hugo-version: '0.74.3'
           extended: true
       - name: Verify the site still builds
+        if: steps.kind.outputs.kind != ''
         run: hugo --gc --minify -b "http://localhost:1313/"
 
       - name: Open the pull request
+        if: steps.kind.outputs.kind != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE: ${{ github.event.issue.number }}
@@ -97,7 +115,7 @@ jobs:
           gh issue comment "$ISSUE" --body "Thanks! This is now open as ${URL} and will go live once a maintainer merges it."
 
       - name: Report failure back on the issue
-        if: failure()
+        if: failure() && steps.kind.outputs.kind != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE: ${{ github.event.issue.number }}

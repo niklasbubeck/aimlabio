@@ -122,7 +122,7 @@ body:
     attributes:
       label: Photo
       description: >-
-        Drag a square JPEG, PNG or WebP into this box (500x500 is plenty, max 8 MB).
+        Drag a square JPEG, PNG, WebP or GIF into this box (500x500 is plenty, max 8 MB).
         Do not paste a link to a photo hosted elsewhere.
     validations: {required: true}
   - type: textarea
