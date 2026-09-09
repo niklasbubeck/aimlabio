@@ -1,0 +1,49 @@
+# Builds the site on every pull request without deploying it, so a broken
+# build is caught before merge rather than after it is live.
+#
+# The built site is attached to the run as a downloadable artifact.
+name: Build check
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preview-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.19'
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            resources/_gen
+          key: hugo-${{ runner.os }}-${{ hashFiles('go.sum') }}
+          restore-keys: hugo-${{ runner.os }}-
+
+      - uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: '0.74.3'
+          extended: true
+
+      # --buildFuture surfaces posts dated ahead of today, which are otherwise
+      # invisible until their publish date.
+      - name: Build
+        run: hugo --gc --minify --buildFuture -b "http://localhost:1313/"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site-${{ github.event.pull_request.number }}
+          path: ./public
+          retention-days: 7

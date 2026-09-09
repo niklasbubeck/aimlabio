@@ -1,0 +1,73 @@
+# Builds the Hugo site and deploys it to GitHub Pages.
+#
+# Nothing generated is ever committed: the built site is uploaded as a Pages
+# artifact straight from the runner. To publish a change, push to main.
+#
+# Requires: Settings -> Pages -> Source: "GitHub Actions".
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race; a newer push supersedes an in-flight one.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      HUGO_ENV: production
+    steps:
+      # Shallow clone is fine: enableGitInfo is false in config/_default/config.toml.
+      - uses: actions/checkout@v4
+
+      # Hugo Modules resolve the Wowchemy theme through the Go toolchain.
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.19'
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            resources/_gen
+          key: hugo-${{ runner.os }}-${{ hashFiles('go.sum') }}
+          restore-keys: hugo-${{ runner.os }}-
+
+      # Pinned to the versions the live site was built with. Wowchemy compiles
+      # SCSS, so the extended build is required.
+      - uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: '0.74.3'
+          extended: true
+
+      - uses: actions/configure-pages@v5
+        id: pages
+
+      # base_url adapts to wherever Pages serves this repo, overriding the
+      # baseurl in config/_default/config.toml.
+      - name: Build
+        run: hugo --gc --minify -b "${{ steps.pages.outputs.base_url }}/"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
