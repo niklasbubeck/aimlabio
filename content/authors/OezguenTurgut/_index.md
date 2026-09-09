@@ -1,6 +1,7 @@
 ---
 # Display name
-title: Özgün Turgut 
+title: "Özgün Turgut"
+last_name: "Turgut"
 
 # Username (this should match the folder name)
 authors:
@@ -10,7 +11,7 @@ authors:
 superuser: false
 
 # Role/position
-role: PhD Student
+role: Doctoral researcher
 
 # Organizations/Affiliations
 organizations:
@@ -23,23 +24,23 @@ bio: My research interests focus on signal processing using deep learning method
 interests:
 - Signal processing
 - Self-supervised learning
-- Human brain & heart analysis
+- Multimodal AI
 
 education:
   courses:
   - course: Electrical Engineering and Information Technology (M.Sc.)
-    institution: Technical University of Munich
+    institution: TUM
     year: 2021
-  - course: Electrical Engineering and Information Technology (M.Sc.)
-    institution: University of Technology Sydney, New South Wales, Australia
+  - course: "(M.Sc.)"
+    institution: University of Technology Sydney
     year: 2019
-  - course: Electrical Engineering and Information Technology (B.Sc.)
-    institution: Technical University of Munich
+  - course: "(B.Sc.)"
+    institution: TUM
     year: 2019
   - course: Management & Technology (B.Sc.)
-    institution: Technical University of Munich
+    institution: TUM
     year: 2016
- 
+
 # Social/Academic Networking
 # For available icons, see: https://sourcethemes.com/academic/docs/page-builder/#icons
 #   For an email link, use "fas" icon pack, "envelope" icon, and a link in the
@@ -66,4 +67,4 @@ user_groups:
 - "Researchers"
 ---
 
-I am a Ph.D. student at the Department of Neurology and the Institute of Artificial Intelligence in Medicine at the Technical University of Munich (TUM). I completed my masters in Electrical Engineering and Information Technology at TUM and the University of Technology Sydney, Australia. During my studies, I worked on machine learning projects to detect white blood cells in whole blood or to track the movement profile of Multiple Sclerosis (MS) patients. Currently, I am developing deep learning models to analyse medical time series data, including electroencephalography (EEG) and electrocardiography (ECG) signals. If you are interested in working on signal processing with deep learning for your thesis or study project, feel free to contact me.
+Özgün Turgut is a Ph.D. student at the Department of Neurology and the Institute of Artificial Intelligence in Medicine at the Technical University of Munich (TUM). He completed his masters in Electrical Engineering and Information Technology at TUM and the University of Technology Sydney, Australia. In his previous projects, he worked on machine learning models for in-vitro diagnostic devices that allow for low-cost, high-throughput haematology analysis in clinical practice. Currently, he is developing multimodal AI to analyse medical time series data, including electroencephalography (EEG) and electrocardiography (ECG) signals.
