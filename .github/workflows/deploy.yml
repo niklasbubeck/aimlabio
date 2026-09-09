@@ -50,8 +50,12 @@ jobs:
           hugo-version: '0.74.3'
           extended: true
 
+      # enablement: true turns Pages on with the "GitHub Actions" source if it
+      # has never been configured, so no manual setup is needed for a new repo.
       - uses: actions/configure-pages@v5
         id: pages
+        with:
+          enablement: true
 
       # base_url adapts to wherever Pages serves this repo, overriding the
       # baseurl in config/_default/config.toml.
