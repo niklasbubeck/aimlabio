@@ -8,6 +8,8 @@ renders nowhere or a form field that is quietly ignored:
   3. a user_group in the People widget that no form offers
   4. the workflow sniffing the issue body for a field label that no longer exists,
      which silently turns every submission into a no-op
+  5. a field renamed on a form but still described under its old name in
+     CONTRIBUTING.md, so contributors are told to fill in something that is not there
 """
 
 import pathlib
@@ -23,6 +25,11 @@ PEOPLE = (ROOT / "content/home/people.md").read_text(encoding="utf-8")
 
 GROUPS = re.findall(r'"([^"]+)"', re.search(r"user_groups\s*=\s*\[(.*?)\]", PEOPLE, re.S).group(1))
 
+# Helper fields that only exist to support another field, and so need no entry of
+# their own in the contributor documentation.
+DOC_EXEMPT = {"Role (if you picked Other)"}
+CONTRIBUTING = (ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
+
 problems = []
 offered = set()
 
@@ -36,6 +43,8 @@ for form in FORMS:
         label = block["attributes"]["label"]
         if f'"{label}"' not in SCRIPT:
             problems.append(f"{form.name}: field '{label}' is never read by issue_to_author.py")
+        if label not in DOC_EXEMPT and label not in CONTRIBUTING:
+            problems.append(f"{form.name}: field '{label}' is not explained in CONTRIBUTING.md")
         if block["type"] == "dropdown" and label == "Group":
             for option in block["attributes"]["options"]:
                 if option == "No change":
@@ -70,6 +79,6 @@ for group in GROUPS:
 
 for p in problems:
     print(f"::error::{p}")
-print(f"checked {len(FORMS)} forms against {len(GROUPS)} groups: "
-      f"{'FAILED' if problems else 'consistent'}")
+print(f"checked {len(FORMS)} forms against {len(GROUPS)} groups, the workflow and "
+      f"CONTRIBUTING.md: {'FAILED' if problems else 'consistent'}")
 sys.exit(1 if problems else 0)

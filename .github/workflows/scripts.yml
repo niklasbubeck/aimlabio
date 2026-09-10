@@ -6,7 +6,7 @@ on:
   push:
     paths: ['.github/scripts/**', '.github/workflows/scripts.yml', '.github/workflows/member-request.yml', '.github/ISSUE_TEMPLATE/**']
   pull_request:
-    paths: ['.github/scripts/**', '.github/ISSUE_TEMPLATE/**', '.github/workflows/member-request.yml', 'content/home/people.md']
+    paths: ['.github/scripts/**', '.github/ISSUE_TEMPLATE/**', '.github/workflows/member-request.yml', 'content/home/people.md', 'CONTRIBUTING.md']
 
 permissions:
   contents: read
