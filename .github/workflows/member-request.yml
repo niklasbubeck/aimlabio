@@ -88,6 +88,7 @@ jobs:
         run: hugo --gc --minify -b "http://localhost:1313/"
 
       - name: Open the pull request
+        id: pr
         if: steps.kind.outputs.kind != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -95,27 +96,65 @@ jobs:
           AUTHOR: ${{ github.event.issue.user.login }}
           SUMMARY: ${{ steps.gen.outputs.summary }}
           FOLDER: ${{ steps.gen.outputs.folder }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
         run: |
           set -euo pipefail
           BRANCH="member-request/${ISSUE}"
+          BOT_EMAIL="41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.email "$BOT_EMAIL"
           git checkout -b "$BRANCH"
           git add "content/authors/${FOLDER}"
           git commit -m "$SUMMARY" -m "Requested by @${AUTHOR} in #${ISSUE}."
-          git push --force-with-lease -u origin "$BRANCH"
-          URL=$(gh pr create \
-            --base main --head "$BRANCH" \
-            --title "$SUMMARY" \
-            --body "Generated from #${ISSUE}, requested by @${AUTHOR}.
 
-          The site was built successfully with this change before this PR was opened.
-          Review the profile below, then merge to publish. Closes #${ISSUE}." 2>/dev/null \
-            || gh pr view "$BRANCH" --json url --jq .url)
-          gh issue comment "$ISSUE" --body "Thanks! This is now open as ${URL} and will go live once a maintainer merges it."
+          # A re-approval reruns this job. Replacing our own branch is fine, but
+          # never discard commits a reviewer pushed onto it by hand.
+          git fetch origin "$BRANCH" 2>/dev/null || true
+          if git rev-parse --verify -q "origin/${BRANCH}" >/dev/null; then
+            if [ "$(git log -1 --format='%ae' "origin/${BRANCH}")" != "$BOT_EMAIL" ]; then
+              echo "::error::${BRANCH} has commits that this workflow did not make. Refusing to overwrite them - merge or delete that branch first."
+              exit 1
+            fi
+          fi
+          git push --force -u origin "$BRANCH"
+
+          # Opening a PR needs "Allow GitHub Actions to create and approve pull
+          # requests" (Settings > Actions > General). Without it the push above
+          # still succeeds, so hand over a one-click compare link rather than
+          # leaving the work stranded on a branch nobody knows about.
+          if PR_URL=$(gh pr create --base main --head "$BRANCH" \
+                --title "$SUMMARY" \
+                --body "Generated from #${ISSUE}, requested by @${AUTHOR}.
+
+          The site was built successfully with this change before this pull request was opened.
+          Review the profile, then merge to publish. Closes #${ISSUE}." 2>"$RUNNER_TEMP/pr.err"); then
+            :
+          elif PR_URL=$(gh pr view "$BRANCH" --json url --jq .url 2>/dev/null); then
+            echo "Reusing the pull request that already exists for $BRANCH."
+          else
+            ERR=$(cat "$RUNNER_TEMP/pr.err")
+            echo "::error::gh pr create failed: $ERR"
+            HINT=""
+            case "$ERR" in
+              *"not permitted"*|*"Resource not accessible"*)
+                HINT="
+
+          To let this run unattended, enable **Settings > Actions > General > Workflow permissions > Allow GitHub Actions to create and approve pull requests**."
+                ;;
+            esac
+            gh issue comment "$ISSUE" --body "The changes are ready on branch \`${BRANCH}\` and the site builds with them, but this workflow could not open the pull request itself:
+
+          > ${ERR}
+
+          [**Open the pull request**](${REPO_URL}/compare/main...${BRANCH}?expand=1) - one click, nothing is lost.${HINT}"
+            echo "commented=true" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+
+          gh issue comment "$ISSUE" --body "Thanks! This is now open as ${PR_URL} and will go live once a maintainer merges it."
 
       - name: Report failure back on the issue
-        if: failure() && steps.kind.outputs.kind != ''
+        if: failure() && steps.kind.outputs.kind != '' && steps.pr.outputs.commented != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE: ${{ github.event.issue.number }}
