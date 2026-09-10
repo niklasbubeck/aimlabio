@@ -6,7 +6,7 @@ last_name: "Test"
 authors:
 - AdrianTest
 
-role: "Doctoral researcher"
+role: "Research Scientist"
 
 organizations:
 - name: "Technical University of Munich"
@@ -32,7 +32,7 @@ social:
 email: "adrian@test.tum.de"
 
 user_groups:
-- "Senior Researchers"
+- "Alumni"
 ---
 
 Trains are the best
