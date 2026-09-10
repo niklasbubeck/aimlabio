@@ -45,9 +45,9 @@ jobs:
             kind=new-member
           elif [ "$HAS_UPDATE" = "true" ]; then
             kind=update-profile
-          elif grep -q '^### Display name' <<< "$ISSUE_BODY"; then
+          elif grep -q '^### Full name' <<< "$ISSUE_BODY"; then
             kind=new-member
-          elif grep -q '^### Folder name' <<< "$ISSUE_BODY"; then
+          elif grep -q '^### Your name' <<< "$ISSUE_BODY"; then
             kind=update-profile
           else
             kind=""
