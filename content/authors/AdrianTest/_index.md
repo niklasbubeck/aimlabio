@@ -13,10 +13,10 @@ organizations:
   url: "https://www.translatum.tum.de/en/translatum/research-groups/daniel-rueckert-ai-in-healthcare-and-medicine/"
 - name: "Konrad Zuse School of Excellence"
 
-bio: "Best Guy"
+bio: "I like trains"
 
 interests:
-- "Medical Image Registration"
+- "I like trains"
 
 education:
   courses:
@@ -32,7 +32,7 @@ social:
 email: "adrian@test.tum.de"
 
 user_groups:
-- "Researchers"
+- "Senior Researchers"
 ---
 
-I like being here
+Trains are the best
