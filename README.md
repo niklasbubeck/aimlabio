@@ -12,7 +12,7 @@ No generated HTML lives in this repo.
 Lab members do not need to be repository collaborators. They can file a
 [form](.github/ISSUE_TEMPLATE/new-member.yml) to add or update a profile, which a maintainer
 turns into a pull request with one label, or edit any file through GitHub's web editor, which
-forks and opens a pull request for them automatically. See [CONTRIBUTING.md](CONTRIBUTING.md), and [docs/WORKFLOW.md](docs/WORKFLOW.md)
+forks and opens a pull request for them automatically. See [CONTRIBUTING.md](CONTRIBUTING.md), and [WORKFLOW.md](WORKFLOW.md)
 for diagrams of how publishing and contributing actually flow.
 
 ## Publishing a change

@@ -72,5 +72,5 @@ Open a [blank issue](../../issues/new) and describe what should change. Someone 
   not correctness of the YAML.
 - `python3 .github/scripts/test_issue_to_author.py` runs the automation's test suite locally;
   CI runs it on any change under `.github/scripts/`.
-- [`docs/WORKFLOW.md`](docs/WORKFLOW.md) has diagrams of both pipelines.
+- [`WORKFLOW.md`](WORKFLOW.md) has diagrams of both pipelines.
 - Never run the site build by hand and never commit generated HTML. See `README.md`.
